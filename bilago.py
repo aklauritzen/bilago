@@ -17,23 +17,6 @@ from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.styles.fills import PatternFill
 from docx2pdf import convert
 
-# FIXME: importlib.metadata.PackageNotFOundError: docx2pdf
-
-# FIXME: Pyinstaller --nosoncole gør, at Windows tror filen er en virus?
-#  - Måske blot skjule konsollen, i stedet for at fjerne den
-
-# TODO: Kun sidetal (Eventuelt flueben under indstillinger)
-
-
-# Version 2.0
-# Test om der kan slås Multiprocessor til
-# Anmation af tandhjul ved load
-# Printjob - Kan den klipse og hulle?
-# Optimer EXE-filen. Kan biblioteker undlades?
-# Lav en videoguide til brug
-# Selvstændigt site på vidensserveren (Mikrowebsite - Hardcoded)
-#  ( Filen kan ligge på serveren, og køres fra serveren)
-
 # Regular expression: indholdet mellem { }
 annex_number_pattern = '{(.*?)}'
 
@@ -389,7 +372,6 @@ def build_annex_overview():
     sheet.oddFooter.center.text = "Side &[Page] af &N"
     sheet.print_area = 'A:C'
 
-    # FIXME: Bilagsoversigten sorterer forkert. 1-3-1 kommer før 1-3. Hvordan kan det løses?
     # Sorter bilagskolonnen
     # sheet.auto_filter.add_sort_condition(f'A1:A{len(annex_list) + 1}')
     # sheet.auto_filter.add_sort_condition('A:A')
@@ -405,9 +387,7 @@ def create_combined_pdf_file():
         # Læg alle filerne sammen til én pdf
         print(pdf_file.title())
 
-        # TODO: Sorter den samlede pdf ud fra bilagsnummer
-
-
+        
 def delete_temporary_converted_docx_files():
     for file in temporary_docx_pdf_files:
         pdf_filename = file.replace('.docx', '.pdf')
