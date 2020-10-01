@@ -17,31 +17,31 @@ from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.styles.fills import PatternFill
 from docx2pdf import convert
 
-# Regular expression: indholdet mellem { }
+# Regular expression: content between { }
 annex_number_pattern = '{(.*?)}'
 
 # Regular expression: ABCD-12345-12345-20
 journalnumber_pattern = r'[A-Za-z0-9]{4}-[A-Za-z0-9]{5}-[A-Za-z0-9]{5}-[A-Za-z0-9]{2}'
 
-# Liste med Annex objekter
+# Annex objects
 annex_list = []
 
-# Kildemappe
+# Sourcefolder
 source_folder = ''
 
-# Destinationsmappen
+# Destinationfolder
 destination_folder = ''
 
-# Antal bilag
+# Annexcount
 annex_count = 0
 
-# Operationstitel
+# Operationtitel
 operation_titel = ''
 
-# Liste med .docx filer
+# .docx files
 docx_files_list = []
 
-# Liste med midlertidige konverterede docx filer
+# Temporary converted .docx files
 temporary_docx_pdf_files = []
 
 
@@ -55,7 +55,7 @@ class Annex(object):
 
 
 def inform_user():
-    # Tema (Skal hedde DarkBlack1 mv.)
+    # Theme (Should always be fixed to default names: DarkBlack1 etc.)
     sg.LOOK_AND_FEEL_TABLE['DarkBlack1'] = {'BACKGROUND': '#f8f5f1',
                                             'TEXT': '#001e3c',
                                             'INPUT': '#fff',
@@ -67,7 +67,6 @@ def inform_user():
                                             'PROGRESS_DEPTH': 0, }
     sg.theme('DarkBlack1')
 
-    # layout = [[sg.Text('BILA{GO}', font='arial 25 bold')],
     layout = [[sg.Image(filename='static/images/header.png')],
 
               [sg.Text('Programbeskrivelse', font='"arial Bold" 13')],
@@ -83,8 +82,7 @@ def inform_user():
                sg.Text('{A-1-2-1} - 13B Rapport Jens Jensen.docx')],
               [sg.Text('▶', text_color='#001E3C', font='arial 15'),
                sg.Text('{1-2} - Fotorapport Skovvej 31.pdf', font='arial 12')],
-              [sg.Text('\nTuborgklammetegnet laves med tastekombination Alt Gr + 7 eller 0', font='arial 12')],
-              [sg.Text('Bemærk venligst at Bilago kun må anvendes på POLSAS-computere.\n', font='arial 12')],
+              [sg.Text('\nTuborgklammetegnet laves med tastekombination Alt Gr + 7 eller 0\n', font='arial 12')],
               [sg.Text('Vælg mappe med filer der skal behandles', font='"arial Bold" 12')],
               [sg.InputText(), sg.FolderBrowse('Vælg mappe', font='"arial Bold" 12 bold')],
 
@@ -99,32 +97,32 @@ def inform_user():
                   '\nUdviklet af Anders Koed Lauritzen                                                           Version 0.8',
                   font='arial 12 italic')]
               ]
-    window = sg.Window('BILA{GO}', layout, size=(600, 760), font='Arial')
+    window = sg.Window('BILA{GO}', layout, size=(600, 720), font='Arial')
 
     # Event Loop
     while True:
         event, values = window.read()
 
-        # Lytter på om vinduet lukkes
+        # Listener "windows closed""
         if event == sg.WIN_CLOSED:
             break
 
-        # Lytter på knappen "Start bilagering"
+        # Listener "Start bilagering"
         elif event == 'Start bilagering':
 
-            # Tag værdien fra input feltet
+            # Store value from inputfield
             global source_folder
             source_folder = values[1]
 
-            # Fortsæt hvis inputfeltet ikke er tomt
+            # Continue if inputfield is not empty
             if source_folder != "":
                 global operation_titel
                 operation_titel = str(values[2])
 
-                # Starter opgavetid
+                # Start tasktimer
                 task_started = time.perf_counter()
 
-                # Vis popbillede
+                # Show popupanimation
                 sg.popup_animated(image_source='static/images/gear_loader.png', no_titlebar=False, title='Afvent...')
 
                 # sg.one_line_progress_meter('Behandler filer', 0, len(annex_list), key='file_progress_meter')
@@ -139,14 +137,14 @@ def inform_user():
 
                     apply_watermarks()
 
-                    # Hvis bilagsfortegnelse fravælges, skal der ikke vises tekst i popup vedr. bilagsfortegnelse
+                    # Text regarding annex_overview should be empty, if annex_overview is unchecked
                     build_annex_overview_popup_text = ''
 
                     if values['build_annex_overview_event']:
                         build_annex_overview()
                         build_annex_overview_popup_text = '▶ Bilagsoversigt genereret\n'
 
-                    # Slet de midlertidige konverterede docx pdf filer
+                    # Delete temporary converted .docx files
                     delete_temporary_converted_docx_files()
 
                     build_combined_pdf_created_text = ''
@@ -154,13 +152,13 @@ def inform_user():
                         create_combined_pdf_file()
                         build_combined_pdf_created_text = '▶ Samlet PDF-fil genereret\n'
 
-                    # Slutter opgavetid
+                    # Stop tasttimer
                     task_ended = time.perf_counter()
 
-                    # Lukker loading popup animation
+                    # Close popupanimation
                     sg.PopupAnimated(image_source=None)
 
-                    # Udregner samlet opgavetid
+                    # Calculate total task time
                     task_total_time = task_ended - task_started
 
                     global annex_count
@@ -175,25 +173,25 @@ def inform_user():
                              + build_annex_overview_popup_text + build_combined_pdf_created_text +
                              f'\nHandling gennemført på {task_total_time:0.2f} sekunder', title='Gennemført')
 
-                    # Nulstil Liste med Annex objekter
+                    # Reset annexlist
                     annex_list = []
 
-                    # Nulstil Destinationsmappen
+                    # Reset destinationfolder
                     destination_folder = ''
 
-                    # Nulstil annex_count
+                    # reset annex_count
                     annex_count = 0
 
-                    # Nulstil docx_files_list
+                    # Reset docx_files_list
                     global docx_files_list
                     docx_files_list = []
 
-                    # Nulstil temporary_docx_pdf_file
+                    # Reset temporary_docx_pdf_file
                     global temporary_docx_pdf_files
                     temporary_docx_pdf_files = []
 
                 else:
-                    # Lukker loading popup animation
+                    # Close loading popup animation
                     sg.PopupAnimated(image_source=None)
 
                     sg.popup(f'Du har valgt en mappe uden PDF-filer eller wordfiler.\n'
@@ -209,13 +207,13 @@ def inform_user():
 def locate_docx_files():
     for docx_file in glob.iglob(source_folder + './**/*.docx', recursive=True):
 
-        # Hvis docx filnavnet indeholder { } og ikke ordet 'Bilageret'
+        # If .docx filename contains { } and not 'Bilageret'
         try:
             annex_number = re.search(annex_number_pattern, docx_file).group(1)
 
-            # Indeholder ikke "Bilageret" i filnavnet
+            # Does not contain "Bilageret" in filename
             if "Bilageret" not in docx_file:
-                # Konvertere docx filen til en pdf
+                # Convert .docx file to pdf file
                 convert_docx_to_pdf(docx_file)
 
         except AttributeError:
@@ -225,26 +223,26 @@ def locate_docx_files():
 def convert_docx_to_pdf(docx_file):
     convert(docx_file)
 
-    # Forsinkelsen gør, at der ikke opstår fejl ved små .docx filer. Det er som om at det eller går for hurtigt.
+    # Delay to resolve a problem when converting small .docxfiles.
     time.sleep(1)
 
     temporary_docx_pdf_files.append(docx_file)
 
 
 def locate_pdf_files():
-    # Find alle PDF filer
+    # Find PDF files
     for pdf_file in glob.iglob(source_folder + './**/*.pdf', recursive=True):
 
-        # Indeholder {} i filnavnet
+        # Look for {} in the filename
         try:
             annex_number = re.search(annex_number_pattern, pdf_file).group(1)
 
-            # Trim whitespace, hvis brugeren f.eks. skriver "1- 2-3"
+            # Trim whitespace. Ex: "1- 2-3" becomes "1-2-3"
             annex_number = re.sub(r"\s+", "", annex_number)
 
-            # Indeholder ikke "Bilageret" i filnavnet
+            # Filename does not contain "bilageret"
             if "Bilageret" not in pdf_file:
-                # Indeholder et journalnummer
+                # Contains a journalnummer
                 journalnumber = re.search(journalnumber_pattern, pdf_file)
 
                 annex_list.append(Annex(journalnumber, os.path.basename(pdf_file), pdf_file, annex_number, None))
@@ -254,9 +252,9 @@ def locate_pdf_files():
 
 
 def apply_watermarks():
-    # Opret mappe til eksport af bilag
     now = datetime.now()
 
+    # Create folder for outputfiles.
     global destination_folder
     destination_folder = source_folder + f" - Bilageret {now.date()} - {now.strftime('%H%M%S')}"
     os.mkdir(destination_folder)
@@ -266,7 +264,7 @@ def apply_watermarks():
                                                 annex.complete_filename,
                                                 annex.annex_number)
 
-        # Modtager sidetal fra def apply_watermark_to_pdf_file()
+        # Receives pagecount from apply_watermark_to_pdf_file()
         annex.num_pages = num_pages
 
         global annex_count
@@ -277,7 +275,7 @@ def apply_watermark_to_pdf_file(base_filename, complete_filename, annex_number):
     # Original fil (rb = open file for reading)
     original_pdf = open(complete_filename, 'rb')
 
-    # Hvis Strict gives følgende fejl: Xref table not zero-indexed. ID numbers for objects will be corrected
+    # Error when using Strict: "Xref table not zero-indexed. ID numbers for objects will be corrected"
     pdf_reader = PdfFileReader(original_pdf, strict=False)
 
     packet = io.BytesIO()
@@ -288,7 +286,7 @@ def apply_watermark_to_pdf_file(base_filename, complete_filename, annex_number):
         can.setFont("Helvetica", 20)
         text = f'{annex_number}-{format(page_num, "03d")}'
 
-        # Finder antal karaktere og ganger med 10 for at få bredden af den kommende tekst
+        # Count number of characters and multiply to calculate the width. ( x * 10 )
         characters_in_annex_number = len(text)
 
         page_center = (int(pdf_reader.pages[i].mediaBox[2]) / 2) - (characters_in_annex_number * 5)
@@ -313,7 +311,7 @@ def apply_watermark_to_pdf_file(base_filename, complete_filename, annex_number):
         pdf_writer.addPage(original_page)
 
     # wb = create file for writing
-    # Sætter Bilageret ind i enden af filnavnet
+    # Add "Bilageret" at the end of the filename
     index = base_filename.find('.pdf')
     base_filename_with_bilageret = base_filename[:index] + f' - Bilageret {datetime.now().date()}' + base_filename[
                                                                                                      index:]
@@ -321,10 +319,10 @@ def apply_watermark_to_pdf_file(base_filename, complete_filename, annex_number):
     result_pdf = open(os.path.join(destination_folder, base_filename_with_bilageret), 'wb')
     pdf_writer.write(result_pdf)
 
-    # Luk pdffilen efter bilagering
+    # Close PDF file
     original_pdf.close()
 
-    # Returnerer antal side i pdf
+    # Return number of pages
     return pdf_reader.numPages
 
 
@@ -341,14 +339,14 @@ def build_annex_overview():
     sheet.column_dimensions['B'].width = 80
     sheet.column_dimensions['C'].width = 9
 
-    # Header stil
+    # Header layout
     header = NamedStyle(name="header")
     header.font = Font(bold=True)
     header_row = sheet[1]
     for cell in header_row:
         cell.style = header
 
-    # Indsæt data fra annex_list
+    # Insert data from annex_list
     for row in range(0, len(annex_list)):
         sheet.cell(column=1, row=row + 2, value=annex_list[row].annex_number)
         sheet.cell(column=2, row=row + 2, value=annex_list[row].base_filename.
@@ -356,13 +354,13 @@ def build_annex_overview():
                    .replace('{' + annex_list[row].annex_number + '} - ', ''))
         sheet.cell(column=3, row=row + 2, value=annex_list[row].num_pages)
 
-    # Conditional statement - vis doubletter i bilagsnumre
+    # Conditional statement - Show doublets in "bilagsnumre"
     red_fill = PatternFill(bgColor="FFC7CE")
     dxf = DifferentialStyle(fill=red_fill)
     duplicate_rule = Rule(type="duplicateValues", dxf=dxf, stopIfTrue=None)
     sheet.conditional_formatting.add(f'A1:A{len(annex_list) + 1}', duplicate_rule)
 
-    # Printopsætning
+    # Printsettings
     sheet.page_setup.orientation = sheet.ORIENTATION_PORTRAIT
     sheet.page_setup.paperSize = sheet.PAPERSIZE_A4
     sheet.sheet_properties.pageSetUpPr.fitToPage = True
@@ -382,9 +380,9 @@ def build_annex_overview():
 
 
 def create_combined_pdf_file():
-    # Find alle PDF filer i den nye Bilageret mappe
+    # Find all PDF files in the output folder
     for pdf_file in glob.iglob(destination_folder + '**/*.pdf', recursive=True):
-        # Læg alle filerne sammen til én pdf
+        # Combine PDF files
         print(pdf_file.title())
 
         
