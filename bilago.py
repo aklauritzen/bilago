@@ -68,7 +68,6 @@ def inform_user():
     sg.theme('DarkBlack1')
 
     layout = [[sg.Image(filename='static/images/header.png')],
-
               [sg.Text('Programbeskrivelse', font='"arial Bold" 13')],
               [sg.Text('Bilago opretter en kopi af dine PDF-filer og wordfiler hvorpå der påføres\n'
                        'bilagsnumre og sidetal. Bemærk at dine originale filer ikke ændres i processen.\n\n'
