@@ -384,7 +384,7 @@ def create_combined_pdf_file():
         # Combine PDF files
         print(pdf_file.title())
 
-        
+
 def delete_temporary_converted_docx_files():
     for file in temporary_docx_pdf_files:
         pdf_filename = file.replace('.docx', '.pdf')
