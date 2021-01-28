@@ -44,7 +44,6 @@ docx_files_list = []
 # Temporary converted .docx files
 temporary_docx_pdf_files = []
 
-
 class Annex(object):
     def __init__(self, journalnumber, base_filename, complete_filename, annex_number, num_pages):
         self.journalnumber = journalnumber
@@ -93,10 +92,10 @@ def inform_user():
               [sg.Text('')],
               [sg.Button('Start bilagering', font='"arial Bold" 12 bold')],
               [sg.Text(
-                  '\nUdviklet af Anders Koed Lauritzen                                                           Version 0.8',
+                  '\nUdviklet af Anders Koed Lauritzen\nFor Sydøstjyllands Politi                                                           Version 0.8',
                   font='arial 12 italic')]
               ]
-    window = sg.Window('BILA{GO}', layout, size=(600, 720), font='Arial')
+    window = sg.Window('BILA{GO}', layout, size=(600, 730), font='Arial')
 
     # Event Loop
     while True:

@@ -1,0 +1,11 @@
+/test_files
+/build/bilago
+/dist/bilago
+/static/images/gear_loader.xcf
+/static/images/header.xcf
+/.vscode
+/.idea
+/__pycache__
+/bilago_pyinstaller_command_one_file.bat
+/bilago.code-workspace
+/bilago.spec
